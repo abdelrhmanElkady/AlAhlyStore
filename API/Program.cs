@@ -1,5 +1,4 @@
 
-
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myCors";
 
@@ -22,6 +21,9 @@ builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+
 
 var app = builder.Build();
 
