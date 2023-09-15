@@ -11,15 +11,35 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public IEnumerable<T> GetAll()
+        public IEnumerable<T> GetAll(string[] includes = null)
         {
-            return _context.Set<T>().ToList();
+            IQueryable<T> query = _context.Set<T>();
+
+            if (includes != null)
+                foreach (var incluse in includes)
+                    query = query.Include(incluse);
+
+            return query.ToList();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync(string[] includes = null)
         {
-            return await _context.Set<T>().ToListAsync();
+            IQueryable<T> query = _context.Set<T>();
+
+            if (includes != null)
+                foreach (var incluse in includes)
+                    query = query.Include(incluse);
+            return await query.ToListAsync();
         }
+        //public IEnumerable<T> GetAll()
+        //{
+        //    return _context.Set<T>().ToList();
+        //}
+
+        //public async Task<IEnumerable<T>> GetAllAsync()
+        //{
+        //    return await _context.Set<T>().ToListAsync();
+        //}
 
         public T GetById(int id)
         {

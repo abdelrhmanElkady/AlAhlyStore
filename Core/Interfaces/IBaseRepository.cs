@@ -5,8 +5,10 @@ namespace Core.Interfaces
     {
         T GetById(int id);
         Task<T> GetByIdAsync(int id);
-        IEnumerable<T> GetAll();
-        Task<IEnumerable<T>> GetAllAsync();
+        IEnumerable<T> GetAll(string[] includes = null);
+        Task<IEnumerable<T>> GetAllAsync(string[] includes = null);
+        //IEnumerable<T> GetAll();
+        //Task<IEnumerable<T>> GetAllAsync();
         T Find(Expression<Func<T, bool>> criteria, string[] includes = null);
         Task<T> FindAsync(Expression<Func<T, bool>> criteria, string[] includes = null);
         IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, string[] includes = null);

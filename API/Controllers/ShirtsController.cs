@@ -8,16 +8,21 @@ namespace API.Controllers
     public class ShirtsController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-        public ShirtsController(IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+        public ShirtsController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         // GET: api/<ShirtsController>
         [HttpGet]
-        public async Task<IEnumerable<Shirt>> Get()
+        public async Task<ActionResult<IEnumerable<Shirt>>> Get()
         {
-            return await _unitOfWork.Shirts.GetAllAsync();
+            var shirts = await _unitOfWork.Shirts.GetAllAsync(new[] { "Player","Color","Size" });
+            var shirtsDto = _mapper.Map<IEnumerable<ShirtDto>>(shirts);
+
+            return Ok(shirtsDto);
         }
 
         // GET api/<ShirtsController>/5

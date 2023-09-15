@@ -1,4 +1,7 @@
 
+using API.Helpers;
+using System.Reflection;
+
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myCors";
 
@@ -23,6 +26,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(MappingProfile)));
+
 
 
 var app = builder.Build();
