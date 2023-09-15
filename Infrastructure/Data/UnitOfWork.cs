@@ -10,16 +10,26 @@ namespace Infrastructure.Data
     {
         private readonly ApplicationDbContext _context;
 
-        //public IBaseRepository<Author> Authors { get; private set; }
-        //public IBooksRepository Books { get; private set; }
+        public IBaseRepository<Shirt> Shirts { get; private set; }
+
+        public IBaseRepository<Player> Players { get; private set; }
+
+        public IBaseRepository<Color> Colors { get; private set; }
+
+        public IBaseRepository<Size> Sizes { get; private set; }
 
         public UnitOfWork(ApplicationDbContext context)
         {
             _context = context;
 
-            //Authors = new BaseRepository<Author>(_context);
-            //Books = new BooksRepository(_context);
+            Shirts = new BaseRepository<Shirt>(_context);
+            Players = new BaseRepository<Player>(_context);
+            Colors = new BaseRepository<Color>(_context);
+            Sizes = new BaseRepository<Size>(_context);
+            
         }
+
+        
 
         public int Complete()
         {

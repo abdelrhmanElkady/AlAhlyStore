@@ -6,9 +6,13 @@ using System.Threading.Tasks;
 
 namespace Core.Entities
 {
-    public class TestEntity
+    public class Color
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
+
+        [MaxLength(50)]
+        public string Name { get; set; } = null!;
+
+        public ICollection<Shirt> Shirts { get; set; } = new List<Shirt>();
     }
 }
