@@ -18,7 +18,6 @@ namespace Infrastructure.Data
 
         public DbSet<Shirt> Shirts { get; set; }
         public DbSet<Player> Players { get; set; }
-        public DbSet<Color> Colors { get; set; }
-        public DbSet<Size> Sizes { get; set; }
+        
     }
 }

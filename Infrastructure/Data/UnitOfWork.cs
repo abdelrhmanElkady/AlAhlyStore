@@ -14,9 +14,7 @@ namespace Infrastructure.Data
 
         public IBaseRepository<Player> Players { get; private set; }
 
-        public IBaseRepository<Color> Colors { get; private set; }
-
-        public IBaseRepository<Size> Sizes { get; private set; }
+       
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -24,8 +22,7 @@ namespace Infrastructure.Data
 
             Shirts = new BaseRepository<Shirt>(_context);
             Players = new BaseRepository<Player>(_context);
-            Colors = new BaseRepository<Color>(_context);
-            Sizes = new BaseRepository<Size>(_context);
+           
             
         }
 

@@ -10,15 +10,13 @@ namespace Core.Entities
         public string? ImageUrl { get; set; }
         public string Description { get; set; } = null!;
         public double Price { get; set; }
+        public string Size { get; set; } = String.Empty;
+        public string Color { get; set; } = String.Empty;
 
         public int PlayerId { get; set; }
         public Player? Player { get; set; }
 
-        public int SizeId { get; set; }
-        public Size? Size { get; set; }
-
-        public int ColorId { get; set; }
-        public Color? Color { get; set; }
+       
 
 
     }
