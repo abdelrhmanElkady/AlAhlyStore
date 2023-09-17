@@ -1,10 +1,12 @@
 
 using API.Helpers;
+using Microsoft.Extensions.FileProviders;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myCors";
+
 
 builder.Services.AddCors(options =>
 {
@@ -44,10 +46,18 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+// this is for making wwwroot a file sever to serve static files like images
+app.UseFileServer(new FileServerOptions
+{
+    FileProvider = new PhysicalFileProvider(builder.Environment.WebRootPath),
+    RequestPath = "/wwwroot"
+
+});    
+
 app.UseHttpsRedirection();
 app.UseCors(MyAllowSpecificOrigins);
 
-
+app.UseStaticFiles();
 
 app.UseAuthorization();
 

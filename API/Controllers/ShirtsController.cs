@@ -91,7 +91,7 @@
 
         // POST api/<ShirtsController>
         [HttpPost]
-        public async Task<IActionResult> CreateShirt([FromForm] ShirtDto shirtDto)
+        public async Task<IActionResult> CreateShirt([FromBody] ShirtDto shirtDto)
         {
             if (shirtDto == null)
                 return BadRequest();
@@ -140,7 +140,7 @@
 
         // PUT api/<ShirtsController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditShirt(int id, [FromForm] ShirtDto shirtDto)
+        public async Task<IActionResult> EditShirt(int id, [FromBody] ShirtDto shirtDto)
         {
             var shirt = await _unitOfWork.Shirts.GetByIdAsync(id);
             if (shirt == null)

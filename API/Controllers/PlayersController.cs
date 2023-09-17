@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 
 namespace API.Controllers
 {
@@ -47,7 +48,7 @@ namespace API.Controllers
         }
         // POST api/<PlayersController>
         [HttpPost]
-        public async Task<IActionResult> CreatePlayer([FromForm] PlayerDto playerDto)
+        public async Task<IActionResult> CreatePlayer([FromBody] PlayerDto playerDto)
         {
             if (playerDto == null)
                 return BadRequest();
@@ -88,7 +89,7 @@ namespace API.Controllers
         }
         // PUT api/<PlayersController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditPlayer(int id, [FromForm] PlayerDto playerDto)
+        public async Task<IActionResult> EditPlayer(int id, [FromBody] PlayerDto playerDto)
         {
             var player = await _unitOfWork.Players.GetByIdAsync(id);
             if (player == null)
@@ -154,5 +155,7 @@ namespace API.Controllers
             _unitOfWork.Complete();
             return Ok("This player deleted successfully");
         }
+
+        
     }
 }
