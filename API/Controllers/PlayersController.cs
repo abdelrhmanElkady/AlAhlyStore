@@ -7,12 +7,18 @@ namespace API.Controllers
     [ApiController]
     public class PlayersController : ControllerBase
     {
+        private List<string> _allowedExtensions = new() { ".jpg", ".jpeg", ".png" };
+        private int _maxAllowedSize = 2097152;
+
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public PlayersController(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public PlayersController(IUnitOfWork unitOfWork, IMapper mapper, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: api/<PlayersController>
@@ -41,7 +47,7 @@ namespace API.Controllers
         }
         // POST api/<PlayersController>
         [HttpPost]
-        public async Task<IActionResult> CreatePlayer([FromBody] PlayerDto playerDto)
+        public async Task<IActionResult> CreatePlayer([FromForm] PlayerDto playerDto)
         {
             if (playerDto == null)
                 return BadRequest();
@@ -49,6 +55,30 @@ namespace API.Controllers
             var player = await _unitOfWork.Players.FindAsync(p => p.Name == playerDto.Name);
             if (player != null)
                 return BadRequest("This player already exist");
+            if (playerDto.Image is not null)
+            {
+                var extension = Path.GetExtension(playerDto.Image.FileName);
+
+                if (!_allowedExtensions.Contains(extension.ToLower()))
+                {
+                    return BadRequest($"Not allowed extension {extension}");
+                }
+
+                if (playerDto.Image.Length > _maxAllowedSize)
+                {
+                    return BadRequest($"The maximum size for image is 2MB!");
+
+                }
+
+                var imageName = $"{Guid.NewGuid()}{extension}";
+
+                var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/players", imageName);
+
+                using var stream = System.IO.File.Create(path);
+                await playerDto.Image.CopyToAsync(stream);
+
+                playerDto.ImageUrl = path;
+            }
 
             var playerToSave = _mapper.Map<Player>(playerDto);
            
@@ -58,12 +88,45 @@ namespace API.Controllers
         }
         // PUT api/<PlayersController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditPlayer(int id, [FromBody] PlayerDto playerDto)
+        public async Task<IActionResult> EditPlayer(int id, [FromForm] PlayerDto playerDto)
         {
             var player = await _unitOfWork.Players.GetByIdAsync(id);
             if (player == null)
                 return NotFound($"Didn't find a player with id {id}");
-            
+
+            if (playerDto.Image is not null)
+            {
+                if (!string.IsNullOrEmpty(player.ImageUrl))
+                {
+                    var oldImagePath =  player.ImageUrl;
+
+                    if (System.IO.File.Exists(oldImagePath))
+                        System.IO.File.Delete(oldImagePath);
+                }
+
+                var extension = Path.GetExtension(playerDto.Image.FileName);
+
+                if (!_allowedExtensions.Contains(extension.ToLower()))
+                {
+                    return BadRequest($"Not allowed extension {extension}");
+                }
+
+                if (playerDto.Image.Length > _maxAllowedSize)
+                {
+                    return BadRequest($"The maximum size for image is 2MB!");
+                }
+
+                var imageName = $"{Guid.NewGuid()}{extension}";
+
+                var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/players", imageName);
+
+                using var stream = System.IO.File.Create(path);
+                await playerDto.Image.CopyToAsync(stream);
+
+                playerDto.ImageUrl = path;
+            }
+
+
             player = _mapper.Map(playerDto, player);
             
 
@@ -78,6 +141,15 @@ namespace API.Controllers
             var player = await _unitOfWork.Players.GetByIdAsync(id);
             if (player == null)
                 return NotFound($"Didn't find a player with id {id}");
+
+            if (!string.IsNullOrEmpty(player.ImageUrl))
+            {
+                var oldImagePath = player.ImageUrl;
+
+                if (System.IO.File.Exists(oldImagePath))
+                    System.IO.File.Delete(oldImagePath);
+            }
+
             _unitOfWork.Players.Delete(player);
             _unitOfWork.Complete();
             return Ok("This player deleted successfully");

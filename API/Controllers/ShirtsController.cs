@@ -4,12 +4,18 @@
     [ApiController]
     public class ShirtsController : ControllerBase
     {
+        private List<string> _allowedExtensions = new() { ".jpg", ".jpeg", ".png" };
+        private int _maxAllowedSize = 2097152;
+
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public ShirtsController(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public ShirtsController(IUnitOfWork unitOfWork, IMapper mapper, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: api/<ShirtsController>
@@ -31,6 +37,7 @@
             var shirt = await _unitOfWork.Shirts.FindAsync(s => s.Id == id, new[] { "Player" });
             if(shirt == null)
                 return NotFound($"There is no shirt with id {id}");
+            
             var shirtDto = _mapper.Map<ShirtDto>(shirt);
 
             //Colors.red.ToString();
@@ -84,16 +91,39 @@
 
         // POST api/<ShirtsController>
         [HttpPost]
-        public async Task<IActionResult> CreateShirt([FromBody] ShirtDto shirtDto)
+        public async Task<IActionResult> CreateShirt([FromForm] ShirtDto shirtDto)
         {
             if (shirtDto == null)
                 return BadRequest();
 
             if (string.IsNullOrEmpty(shirtDto.Player))
                 return BadRequest("Please enter a player name");
-            
-           
-           var player = await _unitOfWork.Players.FindAsync(p => p.Name == shirtDto.Player);
+            if (shirtDto.Image is not null)
+            {
+                var extension = Path.GetExtension(shirtDto.Image.FileName);
+
+                if (!_allowedExtensions.Contains(extension.ToLower()))
+                {
+                    return BadRequest($"Not allowed extension {extension}");
+                }
+
+                if (shirtDto.Image.Length > _maxAllowedSize)
+                {
+                    return BadRequest($"The maximum size for image is 2MB!");
+
+                }
+
+                var imageName = $"{Guid.NewGuid()}{extension}";
+
+                var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/shirts", imageName);
+
+                using var stream = System.IO.File.Create(path);
+                await shirtDto.Image.CopyToAsync(stream);
+
+                shirtDto.ImageUrl = path;
+            }
+
+            var player = await _unitOfWork.Players.FindAsync(p => p.Name == shirtDto.Player);
             if(player == null)
                 return NotFound("This player does not existing");
 
@@ -110,7 +140,7 @@
 
         // PUT api/<ShirtsController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditShirt(int id, [FromBody] ShirtDto shirtDto)
+        public async Task<IActionResult> EditShirt(int id, [FromForm] ShirtDto shirtDto)
         {
             var shirt = await _unitOfWork.Shirts.GetByIdAsync(id);
             if (shirt == null)
@@ -118,6 +148,38 @@
             var player = await _unitOfWork.Players.FindAsync(p => p.Name == shirtDto.Player);
             if (player == null)
                 return NotFound("This player is not existing");
+            if (shirtDto.Image is not null)
+            {
+                if (!string.IsNullOrEmpty(player.ImageUrl))
+                {
+                    var oldImagePath = player.ImageUrl;
+
+                    if (System.IO.File.Exists(oldImagePath))
+                        System.IO.File.Delete(oldImagePath);
+                }
+
+                var extension = Path.GetExtension(shirtDto.Image.FileName);
+
+                if (!_allowedExtensions.Contains(extension.ToLower()))
+                {
+                    return BadRequest($"Not allowed extension {extension}");
+                }
+
+                if (shirtDto.Image.Length > _maxAllowedSize)
+                {
+                    return BadRequest($"The maximum size for image is 2MB!");
+                }
+
+                var imageName = $"{Guid.NewGuid()}{extension}";
+
+                var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/shirts", imageName);
+
+                using var stream = System.IO.File.Create(path);
+                await shirtDto.Image.CopyToAsync(stream);
+
+                shirtDto.ImageUrl = path;
+            }
+
 
             shirt = _mapper.Map(shirtDto,shirt);
             shirt.Player = player;
@@ -135,6 +197,13 @@
             var shirt = await _unitOfWork.Shirts.GetByIdAsync(id);
             if (shirt == null)
                 return NotFound($"Didn't find a shirt with id {id}");
+            if (!string.IsNullOrEmpty(shirt.ImageUrl))
+            {
+                var oldImagePath = shirt.ImageUrl;
+
+                if (System.IO.File.Exists(oldImagePath))
+                    System.IO.File.Delete(oldImagePath);
+            }
             _unitOfWork.Shirts.Delete(shirt);
             _unitOfWork.Complete();
             return Ok("This shirt deleted successfully");
