@@ -98,6 +98,9 @@
 
             if (string.IsNullOrEmpty(shirtDto.Player))
                 return BadRequest("Please enter a player name");
+            var player = await _unitOfWork.Players.FindAsync(p => p.Name == shirtDto.Player);
+            if (player == null)
+                return NotFound("This player does not existing");
             if (shirtDto.Image is not null)
             {
                 var extension = Path.GetExtension(shirtDto.Image.FileName);
@@ -120,12 +123,18 @@
                 using var stream = System.IO.File.Create(path);
                 await shirtDto.Image.CopyToAsync(stream);
 
-                shirtDto.ImageUrl = path;
+                // solving the problem of iamge url when publishing
+                if (path.Contains("www."))
+                {
+                    shirtDto.ImageUrl = path.Substring(path.IndexOf("www."));
+                }
+                else
+                {
+                    shirtDto.ImageUrl = path;
+                }
             }
 
-            var player = await _unitOfWork.Players.FindAsync(p => p.Name == shirtDto.Player);
-            if(player == null)
-                return NotFound("This player does not existing");
+            
 
             var shirt = _mapper.Map<Shirt>(shirtDto);
             shirt.Player = player;

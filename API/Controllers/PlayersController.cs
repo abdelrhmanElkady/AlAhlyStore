@@ -78,7 +78,16 @@ namespace API.Controllers
                 using var stream = System.IO.File.Create(path);
                 await playerDto.Image.CopyToAsync(stream);
 
-                playerDto.ImageUrl = path;
+                // solving the problem of iamge url when publishing
+                if (path.Contains("www."))
+                {
+                    playerDto.ImageUrl = path.Substring(path.IndexOf("www."));
+                }
+                else
+                {
+                    playerDto.ImageUrl = path;
+                }
+                
             }
 
             var playerToSave = _mapper.Map<Player>(playerDto);
