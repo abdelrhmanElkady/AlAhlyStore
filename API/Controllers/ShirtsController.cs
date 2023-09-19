@@ -1,4 +1,5 @@
-﻿namespace API.Controllers
+﻿
+namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -88,11 +89,27 @@
 
             return Ok(shirtsDto);
         }
+        // GET api/<ShirtsController>/type/type
+        [HttpGet("type/{type}")]
+        public async Task<ActionResult<IEnumerable<ShirtDto>>> GetByType(string type)
+        {
+            var shirts = await _unitOfWork.Shirts.FindAllAsync(s => s.Type == type, new[] { "Player" });
+            if (!shirts.Any())
+                return NotFound($"There is no shirts with type  {type}!");
+            var shirtsDto = _mapper.Map<IEnumerable<ShirtDto>>(shirts);
+
+            //Colors.red.ToString();
+            //return Enum.GetValues(typeof(Colors)).Cast<Colors>().Select(v => v.ToString()).ToList();
+
+            return Ok(shirtsDto);
+        }
 
         // POST api/<ShirtsController>
         [HttpPost]
         public async Task<IActionResult> CreateShirt([FromBody] ShirtDto shirtDto)
         {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
             if (shirtDto == null)
                 return BadRequest();
 
@@ -101,6 +118,18 @@
             var player = await _unitOfWork.Players.FindAsync(p => p.Name == shirtDto.Player);
             if (player == null)
                 return NotFound("This player does not existing");
+
+            List<string> colors = Enum.GetValues(typeof(Colors)).Cast<Colors>().Select(v => v.ToString()).ToList();
+            if (!colors.Contains(shirtDto.Color))
+                return BadRequest($"This color doesn't exist: {shirtDto.Color}");
+            List<string> sizes = Enum.GetValues(typeof(Sizes)).Cast<Sizes>().Select(v => v.ToString()).ToList();
+            if (!colors.Contains(shirtDto.Size))
+                return BadRequest($"This size doesn't exist: {shirtDto.Size}");
+            List<string> types = Enum.GetValues(typeof(ShirtType)).Cast<ShirtType>().Select(v => v.ToString()).ToList();
+            if (!colors.Contains(shirtDto.Type))
+                return BadRequest($"This type doesn't exist: {shirtDto.Type}");
+
+
             if (shirtDto.Image is not null)
             {
                 var extension = Path.GetExtension(shirtDto.Image.FileName);
@@ -157,6 +186,17 @@
             var player = await _unitOfWork.Players.FindAsync(p => p.Name == shirtDto.Player);
             if (player == null)
                 return NotFound("This player is not existing");
+
+            List<string> colors = Enum.GetValues(typeof(Colors)).Cast<Colors>().Select(v => v.ToString()).ToList();
+            if (!colors.Contains(shirtDto.Color))
+                return BadRequest($"This color doesn't exist: {shirtDto.Color}");
+            List<string> sizes = Enum.GetValues(typeof(Sizes)).Cast<Sizes>().Select(v => v.ToString()).ToList();
+            if (!colors.Contains(shirtDto.Size))
+                return BadRequest($"This size doesn't exist: {shirtDto.Size}");
+            List<string> types = Enum.GetValues(typeof(ShirtType)).Cast<ShirtType>().Select(v => v.ToString()).ToList();
+            if (!colors.Contains(shirtDto.Type))
+                return BadRequest($"This type doesn't exist: {shirtDto.Type}");
+
             if (shirtDto.Image is not null)
             {
                 if (!string.IsNullOrEmpty(player.ImageUrl))

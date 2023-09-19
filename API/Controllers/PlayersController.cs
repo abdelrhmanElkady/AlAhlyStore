@@ -50,6 +50,8 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreatePlayer([FromBody] PlayerDto playerDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             if (playerDto == null)
                 return BadRequest();
     
@@ -100,6 +102,8 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> EditPlayer(int id, [FromBody] PlayerDto playerDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var player = await _unitOfWork.Players.GetByIdAsync(id);
             if (player == null)
                 return NotFound($"Didn't find a player with id {id}");

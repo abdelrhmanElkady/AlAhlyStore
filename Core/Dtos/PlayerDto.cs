@@ -5,8 +5,8 @@ namespace Core.Dtos
     {
         public int? Id { get; set; }
 
-        [MaxLength(500)]
-        public string Name { get; set; } = String.Empty;
+        [MaxLength(100)]
+        public string Name { get; set; } =  null!;
         public string? ImageUrl { get; set; }
         public IFormFile? Image { get; set; }
     }
