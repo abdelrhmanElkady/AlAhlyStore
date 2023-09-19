@@ -123,10 +123,10 @@ namespace API.Controllers
             if (!colors.Contains(shirtDto.Color))
                 return BadRequest($"This color doesn't exist: {shirtDto.Color}");
             List<string> sizes = Enum.GetValues(typeof(Sizes)).Cast<Sizes>().Select(v => v.ToString()).ToList();
-            if (!colors.Contains(shirtDto.Size))
+            if (!sizes.Contains(shirtDto.Size))
                 return BadRequest($"This size doesn't exist: {shirtDto.Size}");
             List<string> types = Enum.GetValues(typeof(ShirtType)).Cast<ShirtType>().Select(v => v.ToString()).ToList();
-            if (!colors.Contains(shirtDto.Type))
+            if (!types.Contains(shirtDto.Type))
                 return BadRequest($"This type doesn't exist: {shirtDto.Type}");
 
 
