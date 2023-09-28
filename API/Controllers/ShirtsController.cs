@@ -106,7 +106,7 @@ namespace API.Controllers
 
         // POST api/<ShirtsController>
         [HttpPost]
-        public async Task<IActionResult> CreateShirt([FromBody] ShirtDto shirtDto)
+        public async Task<IActionResult> CreateShirt([FromForm] ShirtDto shirtDto)
         {
             if(!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -156,6 +156,7 @@ namespace API.Controllers
                 if (path.Contains("www."))
                 {
                     shirtDto.ImageUrl = path.Substring(path.IndexOf("www."));
+                    shirtDto.ImageUrl = "https://" + shirtDto.ImageUrl;
                 }
                 else
                 {
@@ -178,7 +179,7 @@ namespace API.Controllers
 
         // PUT api/<ShirtsController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditShirt(int id, [FromBody] ShirtDto shirtDto)
+        public async Task<IActionResult> EditShirt(int id, [FromForm] ShirtDto shirtDto)
         {
             var shirt = await _unitOfWork.Shirts.GetByIdAsync(id);
             if (shirt == null)

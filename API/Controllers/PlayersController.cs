@@ -48,7 +48,7 @@ namespace API.Controllers
         }
         // POST api/<PlayersController>
         [HttpPost]
-        public async Task<IActionResult> CreatePlayer([FromBody] PlayerDto playerDto)
+        public async Task<IActionResult> CreatePlayer([FromForm] PlayerDto playerDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -84,6 +84,7 @@ namespace API.Controllers
                 if (path.Contains("www."))
                 {
                     playerDto.ImageUrl = path.Substring(path.IndexOf("www."));
+                    playerDto.ImageUrl = "https://" + playerDto.ImageUrl;
                 }
                 else
                 {
@@ -100,7 +101,7 @@ namespace API.Controllers
         }
         // PUT api/<PlayersController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditPlayer(int id, [FromBody] PlayerDto playerDto)
+        public async Task<IActionResult> EditPlayer(int id, [FromForm] PlayerDto playerDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
