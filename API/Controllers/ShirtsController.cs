@@ -227,7 +227,18 @@ namespace API.Controllers
                 using var stream = System.IO.File.Create(path);
                 await shirtDto.Image.CopyToAsync(stream);
 
-                shirtDto.ImageUrl = path;
+                // solving the problem of iamge url when publishing
+                if (path.Contains("www."))
+                {
+                    shirtDto.ImageUrl = path.Substring(path.IndexOf("www."));
+                    shirtDto.ImageUrl = "https://" + shirtDto.ImageUrl;
+                }
+                else
+                {
+                    shirtDto.ImageUrl = path;
+                }
+
+                
             }
 
 
