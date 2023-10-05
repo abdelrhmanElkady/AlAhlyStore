@@ -113,7 +113,14 @@ namespace API.Controllers
             {
                 if (!string.IsNullOrEmpty(player.ImageUrl))
                 {
-                    var oldImagePath =  player.ImageUrl;
+                    // solving the problem of iamge url when publishing
+                    if (player.ImageUrl.Contains("www."))
+                    {
+                        player.ImageUrl = player.ImageUrl.Substring(player.ImageUrl.IndexOf("www."));
+                        player.ImageUrl = $"d:\\DZHosts\\LocalUser\\AbdElrhmanElkady\\{player.ImageUrl}";
+                    }
+
+                    var oldImagePath = player.ImageUrl;
 
                     if (System.IO.File.Exists(oldImagePath))
                         System.IO.File.Delete(oldImagePath);
@@ -149,6 +156,10 @@ namespace API.Controllers
                     playerDto.ImageUrl = path;
                 }
             }
+            else
+            {
+                playerDto.ImageUrl = player.ImageUrl;
+            }
 
 
             player = _mapper.Map(playerDto, player);
@@ -165,9 +176,16 @@ namespace API.Controllers
             var player = await _unitOfWork.Players.GetByIdAsync(id);
             if (player == null)
                 return NotFound($"Didn't find a player with id {id}");
-
+            
             if (!string.IsNullOrEmpty(player.ImageUrl))
             {
+                // solving the problem of iamge url when publishing
+                if (player.ImageUrl.Contains("www."))
+                {
+                    player.ImageUrl = player.ImageUrl.Substring(player.ImageUrl.IndexOf("www."));
+                    player.ImageUrl = $"d:\\DZHosts\\LocalUser\\AbdElrhmanElkady\\{player.ImageUrl}";
+                }
+             
                 var oldImagePath = player.ImageUrl;
 
                 if (System.IO.File.Exists(oldImagePath))

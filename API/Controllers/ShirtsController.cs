@@ -200,9 +200,16 @@ namespace API.Controllers
 
             if (shirtDto.Image is not null)
             {
-                if (!string.IsNullOrEmpty(player.ImageUrl))
+                if (!string.IsNullOrEmpty(shirt.ImageUrl))
                 {
-                    var oldImagePath = player.ImageUrl;
+                    // solving the problem of iamge url when publishing
+                    if (shirt.ImageUrl.Contains("www."))
+                    {
+                        shirt.ImageUrl = shirt.ImageUrl.Substring(shirt.ImageUrl.IndexOf("www."));
+                        shirt.ImageUrl = $"d:\\DZHosts\\LocalUser\\AbdElrhmanElkady\\{shirt.ImageUrl}";
+                    }
+
+                    var oldImagePath = shirt.ImageUrl;
 
                     if (System.IO.File.Exists(oldImagePath))
                         System.IO.File.Delete(oldImagePath);
@@ -236,9 +243,11 @@ namespace API.Controllers
                 else
                 {
                     shirtDto.ImageUrl = path;
-                }
-
-                
+                }     
+            }
+            else
+            {
+                shirtDto.ImageUrl = shirt.ImageUrl;
             }
 
 
@@ -260,6 +269,13 @@ namespace API.Controllers
                 return NotFound($"Didn't find a shirt with id {id}");
             if (!string.IsNullOrEmpty(shirt.ImageUrl))
             {
+                // solving the problem of iamge url when publishing
+                if (shirt.ImageUrl.Contains("www."))
+                {
+                    shirt.ImageUrl = shirt.ImageUrl.Substring(shirt.ImageUrl.IndexOf("www."));
+                    shirt.ImageUrl = $"d:\\DZHosts\\LocalUser\\AbdElrhmanElkady\\{shirt.ImageUrl}";
+                }
+
                 var oldImagePath = shirt.ImageUrl;
 
                 if (System.IO.File.Exists(oldImagePath))
