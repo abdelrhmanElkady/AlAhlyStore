@@ -174,7 +174,7 @@ namespace API.Controllers
 
             await _unitOfWork.Shirts.AddAsync(shirt);
             _unitOfWork.Complete();
-            return Ok("shirt added successfully");
+            return Ok(_mapper.Map<ShirtDto>(shirt));
         }
 
         // PUT api/<ShirtsController>/5
@@ -257,7 +257,7 @@ namespace API.Controllers
 
             _unitOfWork.Shirts.Update(shirt);
             _unitOfWork.Complete();
-            return Ok("shirt updated successfully");
+            return Ok(_mapper.Map<ShirtDto>(shirt));
         }
 
         // DELETE api/<ShirtsController>/5

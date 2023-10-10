@@ -97,7 +97,7 @@ namespace API.Controllers
            
             await _unitOfWork.Players.AddAsync(playerToSave);
             _unitOfWork.Complete();
-            return Ok("player added successfully");
+            return Ok(_mapper.Map<PlayerDto>(player));
         }
         // PUT api/<PlayersController>/5
         [HttpPut("{id}")]
@@ -167,7 +167,7 @@ namespace API.Controllers
 
             _unitOfWork.Players.Update(player);
             _unitOfWork.Complete();
-            return Ok("player updated successfully");
+            return Ok(_mapper.Map<PlayerDto>(player));
         }
         // DELETE api/<PlayersController>/5
         [HttpDelete("{id}")]
